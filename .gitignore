@@ -40,9 +40,7 @@ config.local.py
 *.json
 
 # PDFs and output artifacts
-input/output/
-input/output/**
-input/**/*.pdf
+
 
 # Images/renders
 *.png
