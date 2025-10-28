@@ -61,41 +61,8 @@ def main():
         records = enrich_batch_with_llm(records, batch_size=10)
         # Save step 4 snapshot (final)
         save_stage_snapshot(records, "step4_records_after_llm_scoring.json")
+        
 
-        enriched_records = records
-        logger.info("Batch enrichment pipeline completed.")
-
-        # Convert to DataFrame
-        df = pd.DataFrame(enriched_records)
-        
-        logger.info("Successfully processed %d records", len(df))
-        logger.info("Displaying a sample of the first 10 enriched rows below")
-        
-        # Display first 10 rows
-        print(tabulate(df.head(10), headers="keys", tablefmt="psql"))
-        
-        # Save to CSV
-        output_file = "enr_parsed_enriched.csv"
-        df.to_csv(output_file, index=False)
-        logger.info("Saved CSV: %s", output_file)
-        
-        # Save to JSON (list of dictionaries)
-        json_output_file = "enr_parsed_enriched.json"
-        with open(json_output_file, "w", encoding="utf-8") as f:
-            json.dump(enriched_records, f, ensure_ascii=False, indent=2)
-        logger.info("Saved JSON: %s", json_output_file)
-        
-        # Print summary statistics
-        logger.info("Summary statistics (if columns available):")
-        if 'revenue_m' in df.columns:
-            avg_rev = f"${df['revenue_m'].mean():,.2f}M"
-            max_rev = f"${df['revenue_m'].max():,.2f}M"
-            min_rev = f"${df['revenue_m'].min():,.2f}M"
-            logger.info("Average Revenue: %s", avg_rev)
-            logger.info("Max Revenue: %s", max_rev)
-            logger.info("Min Revenue: %s", min_rev)
-        if 'rank_2025' in df.columns:
-            logger.info("Total Firms in Ranking: %d", len(df))
         
     except Exception as e:
         logger.exception("Error during pipeline execution: %s", e)

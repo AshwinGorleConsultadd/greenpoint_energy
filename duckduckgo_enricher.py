@@ -9,6 +9,7 @@ import urllib.parse
 import urllib.request
 import re
 import logging
+import time
 
 
 DDG_SEARCH_URL = "https://duckduckgo.com/html/?q={query}"
@@ -144,7 +145,7 @@ def enrich_with_duckduckgo(firm_name: str, location: Optional[str]) -> Dict[str,
     return result
 
 
-def enrich_batch_with_duckduckgo(records: list[Dict[str, Any]], batch_size: int = 15) -> list[Dict[str, Any]]:
+def enrich_batch_with_duckduckgo(records: list[Dict[str, Any]], batch_size: int = 15, rate_limit_delay: float = 0.4) -> list[Dict[str, Any]]:
     """Enrich all records using DuckDuckGo in internal chunks.
 
     - records: full list of records
@@ -166,6 +167,9 @@ def enrich_batch_with_duckduckgo(records: list[Dict[str, Any]], batch_size: int 
             firm_name = str(rec.get("firm", "")).strip()
             ddg = enrich_with_duckduckgo(firm_name, rec.get("location"))
             rec.update(ddg)
+            if rate_limit_delay > 0:
+                time.sleep(rate_limit_delay)
+            logger.debug("[DDG] %d/%d in chunk %d-%d processed: %s", idx - start + 1, end - start, start + 1, end, firm_name or "N/A")
         logger.debug("[DDG] Completed chunk %d-%d/%d", start + 1, end, total)
     logger.info("[DDG] Enrichment completed for %d records", total)
     return records
