@@ -1,0 +1,51 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pytest_cache/
+.mypy_cache/
+.pytype/
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# OS / IDE files
+.DS_Store
+.idea/
+.vscode/
+*.code-workspace
+
+# Build / dist
+build/
+dist/
+*.egg-info/
+
+# Logs and temp
+*.log
+*.tmp
+*.swp
+
+# Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Local config (if any)
+config.local.py
+.env
+
+# Generated data artifacts
+*.csv
+*.json
+
+# PDFs and output artifacts
+input/output/
+input/output/**
+input/**/*.pdf
+
+# Images/renders
+*.png
+*.jpg
+*.jpeg
+*.gif
