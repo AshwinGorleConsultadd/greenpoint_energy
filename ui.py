@@ -150,22 +150,24 @@ def render_table(df: pd.DataFrame) -> Tuple[int, Dict[str, Any]]:
     if AGGRID_AVAILABLE:
         gb = GridOptionsBuilder.from_dataframe(df)
         gb.configure_default_column(sortable=True, filter=True, resizable=True)
-        # Make Action look like a link and handle navigation via click (no HTML)
-        const_on_click = JsCode(
+        # Column-specific click handler and value
+        view_click = JsCode(
             """
-            function(e){
-                if(e.colDef.field === 'Action' && e.data && e.data.Seq !== undefined){
+            function(params){
+                if (params && params.data && params.data.Seq !== undefined) {
                     const parentLoc = (window.parent && window.parent.location) ? window.parent.location : window.location;
                     const base = parentLoc.origin + parentLoc.pathname;
-                    const url = `${base}?lead_seq=${e.data.Seq}`;
+                    const url = `${base}?lead_seq=${params.data.Seq}`;
                     window.top.location.href = url;
                 }
             }
             """
         )
-        gb.configure_grid_options(onCellClicked=const_on_click)
+        view_value = JsCode("function(){return 'View'}")
         gb.configure_column(
             "Action",
+            valueGetter=view_value,
+            onCellClicked=view_click,
             pinned='left',
             width=110,
             sortable=False,
