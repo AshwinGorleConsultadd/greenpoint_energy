@@ -155,9 +155,17 @@ def render_table(df: pd.DataFrame) -> Tuple[int, Dict[str, Any]]:
             """
             function(params) {
                 if (!params.data || params.data.Seq === undefined) { return ''; }
-                const base = window.location.origin + window.location.pathname;
+                // Use parent window (Streamlit wraps components in an iframe on deploy)
+                const parentLoc = (window.parent && window.parent.location) ? window.parent.location : window.location;
+                const base = parentLoc.origin + parentLoc.pathname;
                 const url = `${base}?lead_seq=${params.data.Seq}`;
-                return `<a href="${url}" target="_blank" style="text-decoration:none;">👁️ View</a>`;
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_top';
+                a.rel = 'noopener noreferrer';
+                a.style.textDecoration = 'none';
+                a.textContent = '👁️ View';
+                return a.outerHTML;
             }
             """
         )
@@ -165,6 +173,10 @@ def render_table(df: pd.DataFrame) -> Tuple[int, Dict[str, Any]]:
         # We don't need row selection anymore
         gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=25)
         grid_options = gb.build()
+        custom_css = {
+            ".ag-header-cell-label": {"font-size": "14px", "font-weight": "600"},
+            ".ag-cell": {"font-size": "14px"},
+        }
         grid = AgGrid(
             df,
             gridOptions=grid_options,
@@ -173,6 +185,7 @@ def render_table(df: pd.DataFrame) -> Tuple[int, Dict[str, Any]]:
             fit_columns_on_grid_load=True,
             theme="balham",  # light theme
             allow_unsafe_jscode=True,
+            custom_css=custom_css,
         )
         # Navigation is handled by link; no selection to return
         return -1, {}
