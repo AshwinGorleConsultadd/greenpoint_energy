@@ -14,10 +14,14 @@ st.set_page_config(page_title="Leads Explorer", page_icon="📘", layout="wide")
 
 
 def load_data() -> List[Dict[str, Any]]:
-    """Load leads data from output/final_result.json if available, else a static sample."""
-    file_path = os.path.join("output", "final_result.json")
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
+    """Load leads data from output/final_scored_result.json if available, else final_result.json, else a static sample."""
+    scored_path = os.path.join("output", "final_scored_result.json")
+    base_path = os.path.join("output", "final_result.json")
+    if os.path.exists(scored_path):
+        with open(scored_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    if os.path.exists(base_path):
+        with open(base_path, "r", encoding="utf-8") as f:
             return json.load(f)
     # Static fallback (single record)
     return [
@@ -109,6 +113,9 @@ def to_table_dataframe(data: List[Dict[str, Any]]) -> pd.DataFrame:
             "Action": "View",
             "Seq": d.get("sequence"),
             "Firm": d.get("firm"),
+            "Lead Score": d.get("lead_score"),
+            "Completeness": d.get("completeness_score"),
+            "Relevance": d.get("relevance_score"),
             "ENR 2025": d.get("enr_rank_2025"),
             "ENR 2024": d.get("enr_rank_2024"),
             "Location": d.get("location"),
@@ -224,6 +231,17 @@ def lead_card(d: Dict[str, Any]):
                 st.metric("ENR 2025", d.get("enr_rank_2025", "—"))
             with c2:
                 st.metric("ENR 2024", d.get("enr_rank_2024", "—"))
+
+        # Scores row
+        s1, s2, s3 = st.columns(3)
+        with s1:
+            st.metric("Lead Score", d.get("lead_score", "—"))
+        with s2:
+            comp = d.get("completeness_score")
+            st.metric("Completeness", f"{comp:.2f}" if isinstance(comp, (int, float)) else "—")
+        with s3:
+            rel = d.get("relevance_score")
+            st.metric("Relevance", f"{rel:.2f}" if isinstance(rel, (int, float)) else "—")
 
         st.write(d.get("description") or "")
 

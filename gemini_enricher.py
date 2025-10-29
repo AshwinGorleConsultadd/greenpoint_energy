@@ -224,7 +224,7 @@ def main():
     print(f"📁 Total companies in file: {total}")
 
     # ✅ 1. Configure range
-    start = 91   # <-- starting index (1-based)
+    start = 211  # <-- starting index (1-based)
     count = 40      # <-- number of records to process from start
     end = min(start - 1 + count, total)
     print(f"🚀 Processing records from index {start} to {end} (inclusive)\n")
