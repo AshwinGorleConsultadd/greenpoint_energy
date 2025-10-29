@@ -13,6 +13,19 @@ except Exception:
 st.set_page_config(page_title="Leads Explorer", page_icon="📘", layout="wide")
 
 
+def inject_styles():
+    st.markdown(
+        """
+        <style>
+        /* Make table and headers consistent across environments */
+        .ag-theme-balham, .ag-theme-balham .ag-root, .ag-theme-balham .ag-header-cell-label { font-size: 14px !important; }
+        .ag-theme-balham .ag-header-cell-text { font-weight: 600 !important; }
+        .stDataFrame, .stDataEditor, .stDataFrame table, .stDataEditor table, .stDataFrame th, .stDataEditor th, .stDataFrame td, .stDataEditor td { font-size: 14px !important; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 def load_data() -> List[Dict[str, Any]]:
     """Load leads data from output/final_scored_result.json if available, else final_result.json, else a static sample."""
     scored_path = os.path.join("output", "final_scored_result.json")
@@ -315,6 +328,7 @@ def main():
 
     if lead_seq is not None:
         # Detail page
+        inject_styles()
         render_header(detail=True)
         # Find by sequence
         rec = None
@@ -331,6 +345,7 @@ def main():
         return
 
     # List page
+    inject_styles()
     render_header(detail=False)
     sidebar_filters(data)
 
