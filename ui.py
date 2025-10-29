@@ -150,26 +150,28 @@ def render_table(df: pd.DataFrame) -> Tuple[int, Dict[str, Any]]:
     if AGGRID_AVAILABLE:
         gb = GridOptionsBuilder.from_dataframe(df)
         gb.configure_default_column(sortable=True, filter=True, resizable=True)
-        # Add a clickable View link as first column using JS cell renderer
-        link_renderer = JsCode(
+        # Make Action look like a link and handle navigation via click (no HTML)
+        const_on_click = JsCode(
             """
-            function(params) {
-                if (!params.data || params.data.Seq === undefined) { return ''; }
-                // Use parent window (Streamlit wraps components in an iframe on deploy)
-                const parentLoc = (window.parent && window.parent.location) ? window.parent.location : window.location;
-                const base = parentLoc.origin + parentLoc.pathname;
-                const url = `${base}?lead_seq=${params.data.Seq}`;
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_top';
-                a.rel = 'noopener noreferrer';
-                a.style.textDecoration = 'none';
-                a.textContent = '👁️ View';
-                return a.outerHTML;
+            function(e){
+                if(e.colDef.field === 'Action' && e.data && e.data.Seq !== undefined){
+                    const parentLoc = (window.parent && window.parent.location) ? window.parent.location : window.location;
+                    const base = parentLoc.origin + parentLoc.pathname;
+                    const url = `${base}?lead_seq=${e.data.Seq}`;
+                    window.top.location.href = url;
+                }
             }
             """
         )
-        gb.configure_column("Action", cellRenderer=link_renderer, pinned='left', width=110, sortable=False, filter=False)
+        gb.configure_grid_options(onCellClicked=const_on_click)
+        gb.configure_column(
+            "Action",
+            pinned='left',
+            width=110,
+            sortable=False,
+            filter=False,
+            cellStyle={"color": "#2563EB", "cursor": "pointer", "textDecoration": "underline"}
+        )
         # We don't need row selection anymore
         gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=25)
         grid_options = gb.build()
