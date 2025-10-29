@@ -10,3 +10,6 @@ python-dotenv>=1.0.1
 google-genai
 google-generativeai
 packaging
+streamlit>=1.38.0
+streamlit-aggrid>=0.3.4.post3
+requests>=2.31.0
