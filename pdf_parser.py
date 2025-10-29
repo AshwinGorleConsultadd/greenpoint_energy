@@ -94,8 +94,8 @@ def normalize_enr_table(df: pd.DataFrame) -> pd.DataFrame:
     if len(df.columns) > 0 and ("rank" in str(df.columns[0]).lower() or "firm" in str(df.columns[2]).lower() or not "rank_2025" in str(df.columns[0]).lower()):
         # Define clean column names (14 expected cols)
         clean_cols = [
-            "rank_2025",
-            "rank_2024",
+            "enr_rank_2025",
+            "enr_rank_2024",
             "firm",
             "total_revenue_m",
             "int_total_revenue_m",
@@ -116,8 +116,8 @@ def normalize_enr_table(df: pd.DataFrame) -> pd.DataFrame:
 
     # Clean numeric columns
     num_cols = [
-        "rank_2025",
-        "rank_2024",
+        "enr_rank_2025",
+        "enr_rank_2024",
         "total_revenue",
         "int_total_revenue",
         "new_contracts_m",

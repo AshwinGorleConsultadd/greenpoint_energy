@@ -9,6 +9,7 @@ import json
 import logging
 
 
+
 def add_location_field(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Add a 'location' field to each record, derived from the 'firm' field.
 
@@ -23,6 +24,27 @@ def add_location_field(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         else:
             record['location'] = None
     return records
+
+def filter_relevant_fields(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Keep only the required fields for each record.
+    
+    Missing fields are included with value None to keep a consistent schema.
+    """
+    keep = [
+        "enr_rank_2025",
+        "enr_rank_2024",
+        "firm",
+        "total_revenue_m",
+        "int_total_revenue_m",
+        "new_contracts",
+        "general_building_pct",
+        "water_supply_pct",
+        "location"
+    ]
+    filtered: List[Dict[str, Any]] = []
+    for rec in records:
+        filtered.append({k: rec.get(k) for k in keep})
+    return filtered
 
 
 def save_stage_snapshot(
@@ -47,3 +69,8 @@ def save_stage_snapshot(
     return target_path
 
 
+def clean_data(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """ Clens data """
+    records = add_location_field(records)
+    records = filter_relevant_fields(records)
+    return records
